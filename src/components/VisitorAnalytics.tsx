@@ -30,8 +30,8 @@ const VisitorAnalytics = () => {
   });
 
   // Calculate total visits as sum of all clicks
-  const calculateTotalVisits = (portfolioClicks: number, serviceClicks: any) => {
-    const serviceTotal = Object.values(serviceClicks).reduce((sum: number, clicks: any) => sum + clicks, 0);
+  const calculateTotalVisits = (portfolioClicks: number, serviceClicks: AnalyticsData['serviceClicks']) => {
+    const serviceTotal = Object.values(serviceClicks).reduce((sum: number, clicks: number) => sum + clicks, 0);
     return portfolioClicks + serviceTotal;
   };
 
