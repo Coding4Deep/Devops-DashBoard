@@ -1,8 +1,126 @@
-# Welcome to your Lovable project
+# DevOps Dashboard
 
-## Project info
+A modern, responsive DevOps dashboard that provides real-time service monitoring, visitor analytics, and quick access to your DevOps tools and applications.
 
-**URL**: https://lovable.dev/projects/bdd01d14-94df-469a-8217-996993590ddb
+## Features
+
+- 🔍 **Real-time Service Health Monitoring** - Actual health checks for your services
+- 📊 **Live Visitor Analytics** - Track clicks and visits with localStorage
+- 🚀 **Service Launcher** - Quick access to your DevOps applications
+- 📱 **Responsive Design** - Beautiful UI that works on all devices
+- 🐳 **Dockerized** - Ready for containerized deployment
+
+## Local Development
+
+### Prerequisites
+- Node.js 18+
+- npm or bun
+- Docker (optional)
+
+### Setup
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+```
+
+## Docker Deployment
+
+### Option 1: Docker Build & Run
+```bash
+# Make scripts executable
+chmod +x scripts/*.sh
+
+# Build the image
+./scripts/build.sh
+
+# Run the container
+./scripts/run.sh
+```
+
+### Option 2: Docker Compose
+```bash
+# Start all services (includes MongoDB)
+docker-compose up -d
+
+# Stop services
+docker-compose down
+```
+
+### Option 3: Manual Docker Commands
+```bash
+# Build image
+docker build -t devops-dashboard .
+
+# Run container
+docker run -d -p 3000:80 --name devops-dashboard devops-dashboard
+
+# View logs
+docker logs -f devops-dashboard
+```
+
+## Configuration
+
+### Service URLs
+Update the service URLs in `src/pages/Index.tsx` to point to your actual applications:
+
+```typescript
+const services = [
+  {
+    title: 'Task Manager App',
+    onClick: () => handleServiceClick('Task Manager', 'https://your-actual-url.com', 'taskManagerClick')
+  },
+  // ... other services
+];
+```
+
+### Health Check URLs
+Update the health check URLs in `src/components/ServiceHealthMonitor.tsx`:
+
+```typescript
+const [services, setServices] = useState<Service[]>([
+  { name: 'Portfolio Website', url: 'https://your-portfolio.com', status: 'checking' },
+  // ... other services
+]);
+```
+
+## Analytics
+
+The dashboard tracks:
+- Total page visits
+- Unique visitors (daily)
+- Portfolio button clicks
+- Individual service clicks
+
+All analytics data is stored in localStorage and persists between sessions.
+
+## Production Deployment
+
+1. Update service URLs to production endpoints
+2. Build Docker image: `docker build -t devops-dashboard .`
+3. Deploy to your container platform
+4. Access on port 80 (or configured port)
+
+## Architecture
+
+- **Frontend**: React + TypeScript + Tailwind CSS
+- **Build Tool**: Vite
+- **Container**: Docker with Nginx
+- **Analytics**: localStorage (no external dependencies)
+- **Health Checks**: Direct HTTP requests + CORS proxy fallback
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
 
 ## How can I edit this code?
 

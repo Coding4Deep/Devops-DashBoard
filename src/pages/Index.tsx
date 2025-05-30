@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { FileText, Wrench, ShoppingCart } from 'lucide-react';
+import { FileText, Wrench, ShoppingCart, GitBranch, Database } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
 import ServiceHealthMonitor from '@/components/ServiceHealthMonitor';
@@ -10,20 +10,29 @@ import { toast } from '@/hooks/use-toast';
 
 const Index = () => {
   const handlePortfolioClick = () => {
+    // Dispatch custom event for analytics
+    window.dispatchEvent(new CustomEvent('portfolioClick'));
+    
     toast({
       title: "Redirecting to Portfolio",
       description: "Opening your personal portfolio website...",
     });
+    
     // Replace with your actual portfolio URL
     window.open('https://sagardeepak.dev', '_blank');
   };
 
-  const handleServiceClick = (serviceName: string) => {
+  const handleServiceClick = (serviceName: string, url: string, eventName: string) => {
+    // Dispatch custom event for analytics
+    window.dispatchEvent(new CustomEvent(eventName));
+    
     toast({
       title: `Opening ${serviceName}`,
       description: `Launching ${serviceName} application...`,
     });
-    // Add actual routing logic here
+    
+    // Open the actual service URL
+    window.open(url, '_blank');
   };
 
   const services = [
@@ -32,42 +41,42 @@ const Index = () => {
       description: 'Efficient project management',
       icon: FileText,
       color: 'from-blue-500 to-blue-600',
-      onClick: () => handleServiceClick('Task Manager')
+      onClick: () => handleServiceClick('Task Manager', 'https://github.com/your-username/task-manager', 'taskManagerClick')
     },
     {
       title: 'Dockerfile Optimizer',
       description: 'Optimize your Docker builds',
       icon: Wrench,
       color: 'from-green-500 to-green-600',
-      onClick: () => handleServiceClick('Dockerfile Optimizer')
+      onClick: () => handleServiceClick('Dockerfile Optimizer', 'https://github.com/your-username/dockerfile-optimizer', 'dockerOptimizerClick')
     },
     {
       title: 'DevOps Project Hub',
       description: 'Central project repository',
-      icon: Wrench,
+      icon: GitBranch,
       color: 'from-purple-500 to-purple-600',
-      onClick: () => handleServiceClick('DevOps Hub')
+      onClick: () => handleServiceClick('DevOps Hub', 'https://github.com/your-username/devops-hub', 'devopsHubClick')
     },
     {
       title: 'E-Commerce App',
       description: 'Modern shopping platform',
       icon: ShoppingCart,
       color: 'from-orange-500 to-orange-600',
-      onClick: () => handleServiceClick('E-Commerce')
+      onClick: () => handleServiceClick('E-Commerce', 'https://github.com/your-username/ecommerce-app', 'ecommerceClick')
     },
     {
-      title: 'Future Tool 1',
-      description: 'Coming soon...',
-      icon: Wrench,
-      color: 'from-gray-500 to-gray-600',
-      onClick: () => handleServiceClick('Future Tool 1')
+      title: 'Data Pipeline Tool',
+      description: 'ETL and data processing',
+      icon: Database,
+      color: 'from-teal-500 to-teal-600',
+      onClick: () => handleServiceClick('Data Pipeline', 'https://github.com/your-username/data-pipeline', 'futureTool1Click')
     },
     {
-      title: 'Future Tool 2',
-      description: 'Coming soon...',
+      title: 'Monitoring Dashboard',
+      description: 'Real-time system monitoring',
       icon: FileText,
-      color: 'from-gray-500 to-gray-600',
-      onClick: () => handleServiceClick('Future Tool 2')
+      color: 'from-indigo-500 to-indigo-600',
+      onClick: () => handleServiceClick('Monitoring Dashboard', 'https://github.com/your-username/monitoring-dashboard', 'futureTool2Click')
     }
   ];
 

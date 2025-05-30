@@ -17,27 +17,74 @@ const ServiceHealthMonitor = () => {
     { name: 'E-Commerce App', url: 'https://linkedin.com', status: 'checking' },
   ]);
 
-  const checkServiceHealth = async (service: Service) => {
+  const checkServiceHealth = async (service: Service): Promise<{ status: 'up' | 'down'; responseTime: number }> => {
     try {
       const startTime = Date.now();
       
-      // Using a CORS proxy for demo purposes - in production, use your own health check endpoint
-      const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(service.url)}`, {
-        method: 'GET',
-        timeout: 5000 as any,
-      });
+      // Create AbortController for timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
       
-      const endTime = Date.now();
-      const responseTime = endTime - startTime;
-      
-      return {
-        status: response.ok ? 'up' : 'down',
-        responseTime: responseTime
-      };
+      try {
+        // Try direct fetch first
+        const response = await fetch(service.url, {
+          method: 'HEAD',
+          mode: 'no-cors',
+          signal: controller.signal,
+        });
+        
+        clearTimeout(timeoutId);
+        const endTime = Date.now();
+        const responseTime = endTime - startTime;
+        
+        // For no-cors mode, we can't check response.ok, so if no error thrown, consider it up
+        return {
+          status: 'up',
+          responseTime: responseTime
+        };
+      } catch (directError) {
+        clearTimeout(timeoutId);
+        
+        // If direct fetch fails, try with CORS proxy
+        try {
+          const proxyResponse = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(service.url)}`, {
+            method: 'GET',
+          });
+          
+          const endTime = Date.now();
+          const responseTime = endTime - startTime;
+          
+          if (proxyResponse.ok) {
+            const data = await proxyResponse.json();
+            // Check if the proxied content contains actual HTML (not an error page)
+            const isValidPage = data.contents && 
+              data.contents.includes('<html') && 
+              !data.contents.toLowerCase().includes('not found') &&
+              !data.contents.toLowerCase().includes('error 404') &&
+              !data.contents.toLowerCase().includes('server error');
+            
+            return {
+              status: isValidPage ? 'up' : 'down',
+              responseTime: responseTime
+            };
+          } else {
+            return {
+              status: 'down',
+              responseTime: 0
+            };
+          }
+        } catch (proxyError) {
+          console.log(`Service ${service.name} check failed:`, proxyError);
+          return {
+            status: 'down',
+            responseTime: 0
+          };
+        }
+      }
     } catch (error) {
       console.log(`Service ${service.name} check failed:`, error);
       return {
-        status: 'down' as const,
+        status: 'down',
         responseTime: 0
       };
     }
@@ -91,7 +138,7 @@ const ServiceHealthMonitor = () => {
               }`} />
               <span className="text-white font-medium">{service.name}</span>
             </div>
-            {service.responseTime && (
+            {service.responseTime && service.responseTime > 0 && (
               <span className="text-white/60 text-sm">
                 {service.responseTime}ms
               </span>
